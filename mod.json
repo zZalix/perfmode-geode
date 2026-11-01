@@ -1,0 +1,99 @@
+{
+	"geode": "5.11.2",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"version": "v1.0.0",
+	"id": "zZalix.perfmode",
+	"name": "Perf Mode",
+	"developer": "zZalix",
+	"description": "Cuts frame cost in heavy levels by skipping off-screen objects, throttling decorative effects and keeping sprite data warm. Rendering only: level geometry, physics and timing are never touched.",
+	"tags": [
+		"performance",
+		"optimization",
+		"utility"
+	],
+	"settings": {
+		"enabled": {
+			"type": "bool",
+			"name": "Enable Perf Mode",
+			"description": "Master switch. Turning this off restores stock rendering immediately.",
+			"default": true
+		},
+		"cull-offscreen": {
+			"type": "bool",
+			"name": "Skip off-screen objects",
+			"description": "Objects whose bounding box is fully outside the visible area are not submitted for drawing. They still exist, still collide and still count: only the draw call is skipped.",
+			"default": true
+		},
+		"cull-margin": {
+			"type": "int",
+			"name": "Culling margin (pixels)",
+			"description": "Extra space around the screen that is kept drawn. Raise this if you see objects pop in at the edges; lower it for more savings.",
+			"default": 64,
+			"min": 0,
+			"max": 512,
+			"control": {
+				"slider": true,
+				"slider-step": 8,
+				"input": true
+			}
+		},
+		"skip-particles": {
+			"type": "bool",
+			"name": "Skip particles far off-screen",
+			"description": "Particle systems that are completely outside the view are not updated or drawn. Particles you can see are unaffected.",
+			"default": true
+		},
+		"skip-labels": {
+			"type": "bool",
+			"name": "Skip off-screen labels",
+			"description": "Text labels outside the view are not drawn. Useful in levels that spam text triggers.",
+			"default": true
+		},
+		"limit-particle-count": {
+			"type": "bool",
+			"name": "Cap visible particles",
+			"description": "When a single particle system emits more particles than the cap, the extras are not drawn. The visual difference is minor; the cost saving is not.",
+			"default": false
+		},
+		"particle-cap": {
+			"type": "int",
+			"name": "Particle cap",
+			"description": "Maximum particles drawn per emitter while the cap above is on.",
+			"default": 256,
+			"min": 16,
+			"max": 4096,
+			"control": {
+				"slider": true,
+				"slider-step": 16,
+				"input": true
+			}
+		},
+		"warm-cache": {
+			"type": "bool",
+			"name": "Pre-warm sprite cache",
+			"description": "Loads the sprite frames a level uses before it starts, which removes the first-attempt stutter caused by texture uploads.",
+			"default": true
+		},
+		"show-stats": {
+			"type": "bool",
+			"name": "Show stats overlay",
+			"description": "Draws a small counter with drawn and skipped objects. Purely informational.",
+			"default": false
+		},
+		"kill-switch": {
+			"type": "keybind",
+			"name": "Key: toggle Perf Mode",
+			"description": "Works inside a level. Immediately switches every optimization off or back on.",
+			"category": "gameplay",
+			"default": ["F7"]
+		}
+	},
+	"links": {
+		"source": "https://github.com/zZalix/perfmode-geode"
+	}
+}
