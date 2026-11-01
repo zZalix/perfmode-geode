@@ -2,3 +2,4 @@ build/
 .geode/
 .vscode/
 *.user
+*.geode

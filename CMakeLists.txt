@@ -20,6 +20,11 @@ add_subdirectory("${GEODE_SDK}" geode-sdk)
 
 add_library(${PROJECT_NAME} SHARED
 	src/main.cpp
+	src/Stats.cpp
+	src/Cull.cpp
+	src/CullLayer.cpp
+	src/CullParticles.cpp
+	src/CullLabels.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)

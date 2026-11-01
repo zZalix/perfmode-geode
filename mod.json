@@ -7,7 +7,7 @@
 		"ios": "2.2081"
 	},
 	"version": "v1.0.0",
-	"id": "zZalix.perfmode",
+	"id": "zzalix.perfmode",
 	"name": "Perf Mode",
 	"developer": "zZalix",
 	"description": "Cuts frame cost in heavy levels by skipping off-screen objects, throttling decorative effects and keeping sprite data warm. Rendering only: level geometry, physics and timing are never touched.",
@@ -90,7 +90,9 @@
 			"name": "Key: toggle Perf Mode",
 			"description": "Works inside a level. Immediately switches every optimization off or back on.",
 			"category": "gameplay",
-			"default": ["F7"]
+			"default": [
+				"F7"
+			]
 		}
 	},
 	"links": {

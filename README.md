@@ -1,19 +1,29 @@
 # Perf Mode
 
-Performance mod for Geometry Dash 2.2 that reduces frame cost in heavy levels
-without changing level data, physics or timing.
+Performance mod for Geometry Dash 2.2 that cuts frame cost in heavy levels.
+Level data, physics and timing are never touched.
+
+## What it does
+
+- **Off-screen culling** — level sprites whose bounds fall outside the view are
+  hidden before the draw pass, so the GPU never submits them. Objects stay in
+  the level, still collide and still count.
+- **Particle skip** — emitters completely outside the view stop doing per-frame
+  work.
+- **Label skip** — text objects outside the view are not drawn.
+- **Culling margin** — pixels of slack around the screen so nothing pops in at
+  the edges.
+- **Kill switch** — F7 toggles everything at runtime, mid-level.
 
 ## Settings
-
-Everything is in the mod's settings page in Geode:
 
 | Setting | What it does |
 | --- | --- |
 | Enable Perf Mode | Master switch |
-| Skip off-screen objects | Skips draw calls for objects fully outside the view |
+| Skip off-screen objects | Hides level sprites outside the view |
 | Culling margin | Pixels of extra space kept drawn around the screen |
-| Skip particles far off-screen | Stops updating particle systems that are outside the view |
-| Skip off-screen labels | Skips text labels outside the view |
+| Skip particles far off-screen | Stops off-view particle emitters |
+| Skip off-screen labels | Skips text objects outside the view |
 | Cap visible particles | Limits particles drawn per emitter |
 | Particle cap | The per-emitter limit used by the option above |
 | Pre-warm sprite cache | Loads a level's sprite frames before it starts |
@@ -29,11 +39,8 @@ set GEODE_SDK=C:/path/to/Geode
 geode build
 ```
 
-The packaged `zZalix.perfmode.geode` is written to `build/`.
+The packaged `zzalix.perfmode.geode` is written to `build/`.
 
-Pushing a tag like `v1.0.0` builds a release on GitHub Actions and attaches the
-packaged mod to it.
+## License
 
-## Credits
-
-Made by zZalix.
+MIT
