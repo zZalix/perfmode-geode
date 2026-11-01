@@ -1,15 +1,27 @@
 name: Build
 
 on:
-  push:
-    branches: [main]
-    tags: ["v*"]
-  pull_request:
   workflow_dispatch:
+  push:
+    branches:
+      - "**"
 
 jobs:
   build:
-    uses: geode-sdk/build-geode-mod/.github/workflows/build.yml@main
-    with:
-      sdk: latest
-    secrets: inherit
+    name: Windows
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the mod
+        uses: geode-sdk/build-geode-mod@main
+        with:
+          sdk: latest
+          target: Win64
+          combine: true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Build Output
+          path: build/*.geode
