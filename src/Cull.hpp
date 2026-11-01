@@ -11,18 +11,20 @@ struct Rect {
 	float top;
 };
 
-// The rectangle currently visible, in world coordinates, expanded by margin.
+// Visible rectangle in world coordinates, expanded by margin.
 Rect visibleRect(float margin);
 
 bool intersects(Rect const& a, Rect const& b);
 
-// World-space bounding box of a node using its full transform chain
-// (position, scale, rotation, anchor, camera). Handles nested batch nodes and
-// children so platformer levels and moving groups cull correctly.
+// Full world-space box via the whole transform chain. Accurate but costs 4
+// matrix transforms: only used when the node or its parent is rotated.
 bool worldBounds(cocos2d::CCNode* node, Rect& out);
 
-// True for trigger/spawn/logic-only objects that must never be touched, plus
-// the player.
+// Cheap box: single transform for the center plus scaled extents. Used for
+// the common case (no rotation anywhere), roughly 4x cheaper.
+bool fastBounds(cocos2d::CCNode* node, Rect& out);
+
+// True for the player, triggers and zero-size objects: never touched.
 bool mustSkip(GameObject* obj);
 
 }

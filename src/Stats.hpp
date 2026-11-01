@@ -1,20 +1,24 @@
 #pragma once
 
+#include <atomic>
+#include <cstdint>
+
 namespace perfmode {
 
 void setRuntimeActive(bool active);
 bool runtimeActive();
 
-bool enabled();
-bool cullObjects();
-bool cullParticles();
-float margin();
+// Cached settings, refreshed only when the user changes them.
+struct Settings {
+	bool enabled = true;
+	bool cullObjects = true;
+	bool cullParticles = true;
+	float margin = 64.f;
+};
 
-void onHidden(cocos2d::CCNode* node);
-void pruneRestoreList();
+Settings const& settings();
+void refreshSettings();
 
-unsigned long long drawnCount();
-unsigned long long culledCount();
 void resetCounts();
 
 }

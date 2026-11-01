@@ -8,12 +8,19 @@ using namespace geode::prelude;
 
 struct $modify(PerfModeParticle, cocos2d::CCParticleSystemQuad) {
 	void draw() {
-		if (perfmode::enabled() && perfmode::runtimeActive() && perfmode::cullParticles()) {
+		auto const& cfg = perfmode::settings();
+
+		if (cfg.enabled && perfmode::runtimeActive() && cfg.cullParticles) {
 			perfmode::Rect bounds;
-			if (perfmode::worldBounds(this, bounds)) {
-				auto view = perfmode::visibleRect(perfmode::margin());
+			// Fast box first; only cocos calls here, no atomics beyond a
+			// cached settings read.
+			if (perfmode::fastBounds(this, bounds)) {
+				auto view = perfmode::visibleRect(cfg.margin);
 				if (!perfmode::intersects(bounds, view)) {
-					return;
+					perfmode::Rect exact;
+					if (perfmode::worldBounds(this, exact) && !perfmode::intersects(exact, view)) {
+						return;
+					}
 				}
 			}
 		}

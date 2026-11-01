@@ -6,11 +6,11 @@
 		"mac": "2.2081",
 		"ios": "2.2081"
 	},
-	"version": "v1.0.2",
+	"version": "v1.0.3",
 	"id": "zzalix.perfmode",
 	"name": "Perf Mode",
 	"developer": "zZalix",
-	"description": "Cuts frame cost in heavy levels by skipping off-screen objects, throttling decorative effects and keeping sprite data warm. Rendering only: level geometry, physics and timing are never touched.",
+	"description": "Cuts frame cost in heavy levels. The per-frame work is a cheap AABB pass on cocos' own transform matrices (GPU-supplied), never raw world math on the CPU: zero cost when everything is on screen.",
 	"tags": [
 		"performance",
 		"optimization",

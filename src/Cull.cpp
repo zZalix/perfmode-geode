@@ -21,6 +21,19 @@ bool intersects(Rect const& a, Rect const& b) {
 	return true;
 }
 
+namespace {
+
+bool chainHasRotation(cocos2d::CCNode* node) {
+	for (auto* cur = node; cur; cur = cur->getParent()) {
+		if (cur->getRotation() != 0.f || cur->getRotationX() != 0.f || cur->getRotationY() != 0.f) {
+			return true;
+		}
+	}
+	return false;
+}
+
+}
+
 bool worldBounds(cocos2d::CCNode* node, Rect& out) {
 	if (!node) {
 		return false;
@@ -31,8 +44,6 @@ bool worldBounds(cocos2d::CCNode* node, Rect& out) {
 		return false;
 	}
 
-	// Four corners of the local box, mapped through the full transform chain
-	// so scale, rotation, anchor and camera offsets are all accounted for.
 	cocos2d::CCPoint corners[4] = {
 		node->convertToWorldSpace(cocos2d::CCPoint(0.f, 0.f)),
 		node->convertToWorldSpace(cocos2d::CCPoint(size.width, 0.f)),
@@ -51,23 +62,46 @@ bool worldBounds(cocos2d::CCNode* node, Rect& out) {
 	return true;
 }
 
+bool fastBounds(cocos2d::CCNode* node, Rect& out) {
+	if (!node) {
+		return false;
+	}
+
+	auto const& size = node->getContentSize();
+	if (size.width <= 0.f || size.height <= 0.f) {
+		return false;
+	}
+
+	// One matrix transform for the center, then expand by scaled extents.
+	// Exact whenever nothing in the transform chain is rotated.
+	auto center = node->convertToWorldSpace(cocos2d::CCPoint(size.width * 0.5f, size.height * 0.5f));
+
+	float halfW = size.width * 0.5f * std::abs(node->getScaleX());
+	float halfH = size.height * 0.5f * std::abs(node->getScaleY());
+
+	out = Rect{
+		center.x - halfW,
+		center.y - halfH,
+		center.x + halfW,
+		center.y + halfH
+	};
+
+	return true;
+}
+
 bool mustSkip(GameObject* obj) {
 	if (!obj) {
 		return true;
 	}
 
-	// Player ships, waves and every dual are drawn through player systems.
 	if (geode::cast::typeinfo_cast<PlayerObject*>(obj)) {
 		return true;
 	}
 
-	// Never touch triggers, spawners or lock guides: they carry no visual
-	// cost worth culling and some drive gameplay state.
 	if (obj->m_isTrigger) {
 		return true;
 	}
 
-	// Zero-size or textureless objects cost nothing to draw.
 	auto const& size = obj->getContentSize();
 	if (size.width <= 0.f || size.height <= 0.f) {
 		return true;
