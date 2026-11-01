@@ -10,7 +10,7 @@ struct $modify(PerfModeParticle, cocos2d::CCParticleSystemQuad) {
 	void draw() {
 		if (perfmode::enabled() && perfmode::runtimeActive() && perfmode::cullParticles()) {
 			perfmode::Rect bounds;
-			if (perfmode::nodeBounds(this, bounds)) {
+			if (perfmode::worldBounds(this, bounds)) {
 				auto view = perfmode::visibleRect(perfmode::margin());
 				if (!perfmode::intersects(bounds, view)) {
 					return;

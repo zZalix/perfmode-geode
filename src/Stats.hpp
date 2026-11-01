@@ -2,20 +2,19 @@
 
 namespace perfmode {
 
-struct Stats {
-	unsigned long long drawn = 0;
-	unsigned long long culled = 0;
-};
-
-Stats& stats();
+void setRuntimeActive(bool active);
+bool runtimeActive();
 
 bool enabled();
 bool cullObjects();
 bool cullParticles();
-bool cullLabels();
 float margin();
 
-void setRuntimeActive(bool active);
-bool runtimeActive();
+void onHidden(cocos2d::CCNode* node);
+void pruneRestoreList();
+
+unsigned long long drawnCount();
+unsigned long long culledCount();
+void resetCounts();
 
 }

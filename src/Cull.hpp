@@ -11,13 +11,18 @@ struct Rect {
 	float top;
 };
 
-// Returns the rectangle currently visible on screen, in the coordinate space
-// used by the layer that is being traversed.
+// The rectangle currently visible, in world coordinates, expanded by margin.
 Rect visibleRect(float margin);
 
 bool intersects(Rect const& a, Rect const& b);
 
-// Screen-space bounds of a node, expanded by its scale.
-bool nodeBounds(cocos2d::CCNode* node, Rect& out);
+// World-space bounding box of a node using its full transform chain
+// (position, scale, rotation, anchor, camera). Handles nested batch nodes and
+// children so platformer levels and moving groups cull correctly.
+bool worldBounds(cocos2d::CCNode* node, Rect& out);
+
+// True for trigger/spawn/logic-only objects that must never be touched, plus
+// the player.
+bool mustSkip(GameObject* obj);
 
 }

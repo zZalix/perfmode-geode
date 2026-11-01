@@ -8,8 +8,6 @@ using namespace geode::prelude;
 
 namespace {
 
-// Nodes this mod hid on a previous pass, so they can be restored as soon as
-// they come back into view or the mod is switched off.
 std::vector<WeakRef<cocos2d::CCNode>> g_hidden;
 
 void restoreAll() {
@@ -26,31 +24,27 @@ void cullChildren(cocos2d::CCNode* parent, perfmode::Rect const& view) {
 		return;
 	}
 
-	auto& st = perfmode::stats();
-
 	for (auto child : parent->getChildrenExt()) {
-		if (!geode::cast::typeinfo_cast<GameObject*>(child)) {
+		auto obj = geode::cast::typeinfo_cast<GameObject*>(child);
+		if (!obj || perfmode::mustSkip(obj)) {
 			continue;
 		}
 
 		perfmode::Rect bounds;
-		if (!perfmode::nodeBounds(child, bounds)) {
+		if (!perfmode::worldBounds(obj, bounds)) {
 			continue;
 		}
 
 		if (perfmode::intersects(bounds, view)) {
-			st.drawn++;
-			if (!child->isVisible()) {
-				child->setVisible(true);
-			}
 			continue;
 		}
 
-		st.culled++;
-		if (child->isVisible()) {
-			child->setVisible(false);
-			g_hidden.emplace_back(child);
+		if (!obj->isVisible()) {
+			continue;
 		}
+
+		obj->setVisible(false);
+		g_hidden.emplace_back(obj);
 	}
 }
 
@@ -58,6 +52,9 @@ void cullChildren(cocos2d::CCNode* parent, perfmode::Rect const& view) {
 
 struct $modify(PerfModePlayLayer, PlayLayer) {
 	void updateVisibility(float dt) {
+		// The game's own visibility pass runs first. Permission objects,
+		// gameplay elements and everything gameplay-driven keeps exactly the
+		// visibility the game assigned this tick.
 		PlayLayer::updateVisibility(dt);
 
 		if (!perfmode::enabled() || !perfmode::runtimeActive() || !perfmode::cullObjects()) {
@@ -65,14 +62,10 @@ struct $modify(PerfModePlayLayer, PlayLayer) {
 			return;
 		}
 
-		auto& st = perfmode::stats();
-		st.drawn = 0;
-		st.culled = 0;
-
-		// Rebuild the hidden list each pass: only nodes hidden by us are ever
-		// restored, and nodes the game hid itself are never touched.
-		auto previous = std::move(g_hidden);
-		g_hidden.clear();
+		// Restore what we hid before the game's pass, so the current pass
+		// sees every object candidate again. Objects that re-enter the view
+		// are shown by the game itself from here on.
+		restoreAll();
 
 		auto view = perfmode::visibleRect(perfmode::margin());
 

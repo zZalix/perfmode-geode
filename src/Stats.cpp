@@ -9,12 +9,17 @@ namespace perfmode {
 namespace {
 
 bool g_runtimeActive = true;
+unsigned long long g_drawn = 0;
+unsigned long long g_culled = 0;
 
 }
 
-Stats& stats() {
-	static Stats s;
-	return s;
+void setRuntimeActive(bool active) {
+	g_runtimeActive = active;
+}
+
+bool runtimeActive() {
+	return g_runtimeActive;
 }
 
 bool enabled() {
@@ -29,20 +34,28 @@ bool cullParticles() {
 	return Mod::get()->getSettingValue<bool>("skip-particles");
 }
 
-bool cullLabels() {
-	return Mod::get()->getSettingValue<bool>("skip-labels");
-}
-
 float margin() {
 	return static_cast<float>(Mod::get()->getSettingValue<int64_t>("cull-margin"));
 }
 
-void setRuntimeActive(bool active) {
-	g_runtimeActive = active;
+void onHidden(cocos2d::CCNode*) {
+	g_culled++;
 }
 
-bool runtimeActive() {
-	return g_runtimeActive;
+void pruneRestoreList() {
+}
+
+unsigned long long drawnCount() {
+	return g_drawn;
+}
+
+unsigned long long culledCount() {
+	return g_culled;
+}
+
+void resetCounts() {
+	g_drawn = 0;
+	g_culled = 0;
 }
 
 }
