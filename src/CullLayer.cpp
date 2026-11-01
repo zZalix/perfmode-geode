@@ -8,12 +8,24 @@ using namespace geode::prelude;
 
 namespace {
 
-void cullChildren(cocos2d::CCNode* parent, float margin) {
+// Nodes this mod hid on a previous pass, so they can be restored as soon as
+// they come back into view or the mod is switched off.
+std::vector<WeakRef<cocos2d::CCNode>> g_hidden;
+
+void restoreAll() {
+	for (auto& ref : g_hidden) {
+		if (auto node = ref.lock()) {
+			node->setVisible(true);
+		}
+	}
+	g_hidden.clear();
+}
+
+void cullChildren(cocos2d::CCNode* parent, perfmode::Rect const& view) {
 	if (!parent) {
 		return;
 	}
 
-	auto view = perfmode::visibleRect(margin);
 	auto& st = perfmode::stats();
 
 	for (auto child : parent->getChildrenExt()) {
@@ -28,11 +40,17 @@ void cullChildren(cocos2d::CCNode* parent, float margin) {
 
 		if (perfmode::intersects(bounds, view)) {
 			st.drawn++;
+			if (!child->isVisible()) {
+				child->setVisible(true);
+			}
 			continue;
 		}
 
 		st.culled++;
-		child->setVisible(false);
+		if (child->isVisible()) {
+			child->setVisible(false);
+			g_hidden.emplace_back(child);
+		}
 	}
 }
 
@@ -43,6 +61,7 @@ struct $modify(PerfModePlayLayer, PlayLayer) {
 		PlayLayer::updateVisibility(dt);
 
 		if (!perfmode::enabled() || !perfmode::runtimeActive() || !perfmode::cullObjects()) {
+			restoreAll();
 			return;
 		}
 
@@ -50,10 +69,20 @@ struct $modify(PerfModePlayLayer, PlayLayer) {
 		st.drawn = 0;
 		st.culled = 0;
 
-		auto margin = perfmode::margin();
+		// Rebuild the hidden list each pass: only nodes hidden by us are ever
+		// restored, and nodes the game hid itself are never touched.
+		auto previous = std::move(g_hidden);
+		g_hidden.clear();
 
-		cullChildren(m_objectLayer, margin);
-		cullChildren(m_inShaderObjectLayer, margin);
-		cullChildren(m_aboveShaderObjectLayer, margin);
+		auto view = perfmode::visibleRect(perfmode::margin());
+
+		cullChildren(m_objectLayer, view);
+		cullChildren(m_inShaderObjectLayer, view);
+		cullChildren(m_aboveShaderObjectLayer, view);
+	}
+
+	void onExit() {
+		restoreAll();
+		PlayLayer::onExit();
 	}
 };

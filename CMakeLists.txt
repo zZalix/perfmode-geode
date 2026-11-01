@@ -24,7 +24,6 @@ add_library(${PROJECT_NAME} SHARED
 	src/Cull.cpp
 	src/CullLayer.cpp
 	src/CullParticles.cpp
-	src/CullLabels.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE src)

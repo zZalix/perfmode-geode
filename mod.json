@@ -6,7 +6,7 @@
 		"mac": "2.2081",
 		"ios": "2.2081"
 	},
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"id": "zzalix.perfmode",
 	"name": "Perf Mode",
 	"developer": "zZalix",
@@ -47,43 +47,6 @@
 			"name": "Skip particles far off-screen",
 			"description": "Particle systems that are completely outside the view are not updated or drawn. Particles you can see are unaffected.",
 			"default": true
-		},
-		"skip-labels": {
-			"type": "bool",
-			"name": "Skip off-screen labels",
-			"description": "Text labels outside the view are not drawn. Useful in levels that spam text triggers.",
-			"default": true
-		},
-		"limit-particle-count": {
-			"type": "bool",
-			"name": "Cap visible particles",
-			"description": "When a single particle system emits more particles than the cap, the extras are not drawn. The visual difference is minor; the cost saving is not.",
-			"default": false
-		},
-		"particle-cap": {
-			"type": "int",
-			"name": "Particle cap",
-			"description": "Maximum particles drawn per emitter while the cap above is on.",
-			"default": 256,
-			"min": 16,
-			"max": 4096,
-			"control": {
-				"slider": true,
-				"slider-step": 16,
-				"input": true
-			}
-		},
-		"warm-cache": {
-			"type": "bool",
-			"name": "Pre-warm sprite cache",
-			"description": "Loads the sprite frames a level uses before it starts, which removes the first-attempt stutter caused by texture uploads.",
-			"default": true
-		},
-		"show-stats": {
-			"type": "bool",
-			"name": "Show stats overlay",
-			"description": "Draws a small counter with drawn and skipped objects. Purely informational.",
-			"default": false
 		},
 		"kill-switch": {
 			"type": "keybind",
